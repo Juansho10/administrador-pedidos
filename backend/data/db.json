@@ -1,0 +1,25 @@
+{
+  "pedidos": [
+    {
+      "id": 1,
+      "nombreCliente": "Juan Pérez",
+      "producto": "Hamburguesa Clásica",
+      "cantidad": 2,
+      "estado": "Pendiente"
+    },
+    {
+      "id": 2,
+      "nombreCliente": "María García",
+      "producto": "Pizza Familiar",
+      "cantidad": 1,
+      "estado": "En proceso"
+    },
+    {
+      "id": 3,
+      "nombreCliente": "Carlos López",
+      "producto": "Refresco de Cola",
+      "cantidad": 5,
+      "estado": "Pendiente"
+    }
+  ]
+}

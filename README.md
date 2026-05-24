@@ -1,0 +1,355 @@
+# Sistema Web de Gestión de Pedidos para Pequeños Negocios
+
+Aplicación web full stack para la administración de pedidos, desarrollada como proyecto universitario para la asignatura **Desarrollo de Aplicaciones Web II**.
+
+---
+
+## Descripción
+
+El sistema permite a un pequeño negocio **registrar, consultar, actualizar y eliminar pedidos** de forma sencilla. Cada pedido contiene:
+
+- **Cliente** que realiza el pedido
+- **Producto** solicitado
+- **Cantidad** del producto
+- **Estado** del pedido (Pendiente → En proceso → Entregado)
+
+La aplicación cuenta con un **backend** en Node.js/Express con almacenamiento persistente en archivo JSON y documentación Swagger, y un **frontend** en React con Vite, React Router, Context API y Axios.
+
+---
+
+## Tecnologías utilizadas
+
+### Frontend
+
+| Tecnología | Uso |
+|---|---|
+| **React 18** | Biblioteca para construir la interfaz de usuario |
+| **Vite** | Herramienta de construcción y servidor de desarrollo rápido |
+| **React Router v6** | Navegación entre páginas (Inicio, Pedidos) |
+| **Axios** | Cliente HTTP para consumir la API del backend |
+| **Context API** | Estado global compartido (PedidoContext) |
+| **useState** | Manejo de estado local en formularios |
+| **useEffect** | Carga inicial de datos desde la API |
+| **useContext** | Acceso al estado global desde cualquier componente |
+| **useReducer** | Gestión de acciones CRUD (agregar, actualizar, eliminar) |
+| **CSS puro** | Estilos responsive sin librerías externas |
+
+### Backend
+
+| Tecnología | Uso |
+|---|---|
+| **Node.js** | Entorno de ejecución JavaScript del lado del servidor |
+| **Express** | Framework web para crear la API REST |
+| **Swagger (swagger-jsdoc + swagger-ui-express)** | Documentación interactiva de la API |
+| **CORS** | Middleware para permitir peticiones del frontend |
+| **File System (fs)** | Almacenamiento persistente en archivo JSON |
+
+### Base de datos
+
+No se usa MySQL ni MongoDB. En su lugar, se utiliza un **archivo JSON local** (`backend/data/db.json`) que persiste los datos entre reinicios del servidor.
+
+---
+
+## Requisitos previos
+
+Antes de comenzar, asegúrate de tener instalado en tu computador:
+
+- **Node.js** (versión 18 o superior)
+  - Descargar desde: [https://nodejs.org](https://nodejs.org)
+- **npm** (viene incluido con Node.js)
+- **Git** (opcional, para clonar el repositorio)
+- Un navegador web moderno (Chrome, Firefox, Edge)
+
+Para verificar que Node.js y npm están instalados correctamente:
+
+```bash
+node --version
+npm --version
+```
+
+---
+
+## Instalación paso a paso
+
+### 1. Clonar o descargar el proyecto
+
+```bash
+git clone https://github.com/tu-usuario/app_pedidos.git
+cd app_pedidos
+```
+
+Si no tienes Git, descarga el ZIP desde GitHub y extráelo.
+
+### 2. Instalar dependencias del backend
+
+```bash
+cd backend
+npm install
+```
+
+Este comando instalará `express`, `cors`, `swagger-jsdoc` y `swagger-ui-express`.
+
+### 3. Instalar dependencias del frontend
+
+Abre una **nueva terminal** (sin cerrar la anterior) y ejecuta:
+
+```bash
+cd frontend
+npm install
+```
+
+Este comando instalará `react`, `react-dom`, `react-router-dom`, `axios` y `vite`.
+
+### 4. Ejecutar el backend
+
+En la terminal del backend:
+
+```bash
+cd backend
+npm run dev
+```
+
+El backend se iniciará en `http://localhost:4000`.
+
+Verás este mensaje en la terminal:
+
+```
+Backend corriendo en http://localhost:4000
+Documentación Swagger: http://localhost:4000/api-docs
+```
+
+### 5. Ejecutar el frontend
+
+En la terminal del frontend:
+
+```bash
+cd frontend
+npm run dev
+```
+
+El frontend se iniciará en `http://localhost:3000` y se abrirá automáticamente en tu navegador.
+
+### 6. Abrir la aplicación
+
+Ve a tu navegador y abre:
+
+```
+http://localhost:3000
+```
+
+### 7. Abrir la documentación Swagger
+
+En otra pestaña del navegador:
+
+```
+http://localhost:4000/api-docs
+```
+
+---
+
+## Estructura de carpetas (explicada)
+
+```
+app_pedidos/
+│
+├── backend/                        # Servidor API REST
+│   ├── controllers/
+│   │   └── pedidoController.js     # Lógica CRUD de pedidos
+│   ├── routes/
+│   │   └── pedidoRoutes.js         # Definición de rutas + docs Swagger
+│   ├── data/
+│   │   └── db.json                 # Archivo JSON como base de datos
+│   ├── swagger/
+│   │   └── swagger.js              # Configuración de Swagger
+│   ├── server.js                   # Punto de entrada del servidor
+│   └── package.json                # Dependencias del backend
+│
+├── frontend/                       # Aplicación React
+│   ├── public/                     # Archivos estáticos
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── Navbar.jsx          # Barra de navegación
+│   │   │   └── PedidoForm.jsx      # Formulario de registro de pedidos
+│   │   ├── context/
+│   │   │   └── PedidoContext.jsx   # Contexto global + Provider
+│   │   ├── pages/
+│   │   │   ├── Inicio.jsx          # Página de inicio
+│   │   │   └── Pedidos.jsx         # Página con tabla de pedidos
+│   │   ├── services/
+│   │   │   └── pedidoService.js    # Llamadas Axios al backend
+│   │   ├── reducer/
+│   │   │   └── pedidoReducer.js    # Reducer para CRUD
+│   │   ├── routes/
+│   │   │   └── AppRoutes.jsx       # Configuración de rutas
+│   │   ├── App.jsx                 # Componente principal
+│   │   ├── App.css                 # Estilos globales
+│   │   └── main.jsx                # Punto de entrada React
+│   ├── index.html                  # HTML principal
+│   ├── vite.config.js              # Configuración de Vite
+│   └── package.json                # Dependencias del frontend
+│
+├── .gitignore                      # Archivos ignorados por Git
+└── README.md                       # Esta documentación
+```
+
+---
+
+## Explicación de conceptos
+
+### React
+
+React es una biblioteca de JavaScript para construir interfaces de usuario mediante componentes reutilizables. En este proyecto, cada parte de la interfaz (Navbar, formularios, páginas) es un componente independiente.
+
+### Hooks utilizados
+
+#### useState
+
+Maneja el estado local del formulario de pedidos. Se usa en `PedidoForm.jsx` para rastrear los valores de los campos mientras el usuario escribe:
+
+```javascript
+const [form, setForm] = useState({ nombreCliente: '', producto: '', cantidad: '' })
+```
+
+#### useEffect
+
+Ejecuta código al montar el componente. Se usa en `Pedidos.jsx` para cargar los pedidos desde la API al entrar a la página:
+
+```javascript
+useEffect(() => {
+  cargarPedidos()
+}, [cargarPedidos])
+```
+
+#### useContext
+
+Permite acceder al estado global desde cualquier componente sin necesidad de pasar props manualmente. Se usa en `PedidoForm.jsx` y `Pedidos.jsx` para acceder a las funciones del contexto:
+
+```javascript
+const { pedidos, cargarPedidos, actualizarPedido, eliminarPedido } = usePedidos()
+```
+
+#### useReducer
+
+Gestiona el estado de los pedidos mediante acciones (`cargar`, `agregar`, `actualizar`, `eliminar`). Se combina con Context API en `PedidoContext.jsx`:
+
+```javascript
+const [pedidos, dispatch] = useReducer(pedidoReducer, [])
+```
+
+### Context API
+
+Crea un estado global accesible desde cualquier componente. El `PedidoProvider` envuelve toda la aplicación en `main.jsx` y expone:
+
+- `pedidos`: el arreglo de pedidos
+- `cargarPedidos()`: carga los pedidos desde la API
+- `agregarPedido()`: crea un nuevo pedido
+- `actualizarPedido()`: cambia el estado de un pedido
+- `eliminarPedido()`: elimina un pedido
+
+### Axios
+
+Cliente HTTP que se comunica con el backend. Se usa en `pedidoService.js` para cada operación CRUD:
+
+```javascript
+import axios from 'axios'
+const respuesta = await axios.get('http://localhost:4000/pedidos')
+```
+
+### Swagger
+
+Herramienta que genera documentación interactiva para la API. Al acceder a `http://localhost:4000/api-docs` puedes probar cada endpoint directamente desde el navegador.
+
+Los endpoints documentados:
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/pedidos` | Obtener todos los pedidos |
+| POST | `/pedidos` | Crear un nuevo pedido |
+| PUT | `/pedidos/:id` | Actualizar el estado de un pedido |
+| DELETE | `/pedidos/:id` | Eliminar un pedido |
+
+---
+
+## Flujo de la aplicación
+
+```
+1. El usuario abre la aplicación (http://localhost:3000)
+        │
+2. Ve la página de Inicio con descripción del sistema
+        │
+3. Navega a "Pedidos" usando la barra de navegación
+        │
+4. useEffect() dispara cargarPedidos() → Axios GET /pedidos → se muestran en tabla
+        │
+5. Usuario hace clic en "Crear Pedido"
+        │
+6. Se muestra PedidoForm.jsx (usa useState para los campos)
+        │
+7. Usuario llena el formulario y presiona "Crear Pedido"
+        │
+8. agregarPedido() → Axios POST /pedidos → dispatch({ type: 'agregar' })
+        │
+9. La tabla se actualiza automáticamente con el nuevo pedido
+        │
+10. Usuario puede hacer clic en "Avanzar" para cambiar estado
+    (Pendiente → En proceso → Entregado)
+        │
+11. actualizarPedido() → Axios PUT /pedidos/:id → dispatch({ type: 'actualizar' })
+        │
+12. Usuario puede hacer clic en "Eliminar"
+        │
+13. eliminarPedido() → Axios DELETE /pedidos/:id → dispatch({ type: 'eliminar' })
+```
+
+---
+
+## Capturas sugeridas para el informe universitario
+
+Para tu informe, se recomienda incluir capturas de:
+
+1. **Pantalla completa**: La aplicación funcionando con frontend y backend
+2. **Página de inicio**: La vista `/` con la descripción del sistema
+3. **Lista de pedidos**: La tabla en `/pedidos` mostrando los datos de ejemplo
+4. **Formulario de creación**: El formulario expandido para crear un nuevo pedido
+5. **Swagger**: La documentación interactiva en `http://localhost:4000/api-docs`
+6. **Código del reducer**: El archivo `pedidoReducer.js` mostrando el manejo de acciones
+7. **Código del contexto**: El archivo `PedidoContext.jsx` mostrando el Provider
+8. **Estructura del proyecto**: El árbol de carpetas
+
+---
+
+## Comandos rápidos
+
+```bash
+# Iniciar backend (puerto 4000)
+cd backend && npm run dev
+
+# Iniciar frontend (puerto 3000)
+cd frontend && npm run dev
+
+# Instalar todo (desde la raíz)
+cd backend && npm install
+cd ../frontend && npm install
+```
+
+---
+
+## Solución de problemas
+
+**Error: "port 3000 already in use"**
+→ Cambia el puerto en `frontend/vite.config.js`:
+```javascript
+server: { port: 3001, open: true }
+```
+
+**Error: "Cannot connect to backend"**
+→ Verifica que el backend esté corriendo en `http://localhost:4000`
+
+**Error: "db.json no such file"**
+→ Asegúrate de ejecutar el backend desde la carpeta `backend/`
+
+---
+
+## Licencia
+
+Proyecto académico - Desarrollo de Aplicaciones Web II
