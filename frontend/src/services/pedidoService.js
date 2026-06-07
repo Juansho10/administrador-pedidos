@@ -8,6 +8,11 @@ const pedidoService = {
     return res.data.data
   },
 
+  obtenerMetricas: async () => {
+    const res = await axios.get(`${API_URL}/metricas`)
+    return res.data.data
+  },
+
   crear: async (pedido) => {
     const res = await axios.post(API_URL, pedido)
     return res.data.data

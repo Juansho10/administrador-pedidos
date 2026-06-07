@@ -11,9 +11,11 @@ El sistema permite a un pequeño negocio **registrar, consultar, actualizar y el
 - **Cliente** que realiza el pedido
 - **Producto** solicitado
 - **Cantidad** del producto
+- **Precio** unitario del producto
+- **Fecha** de creación (auto-generada)
 - **Estado** del pedido (Pendiente → En proceso → Entregado)
 
-La aplicación cuenta con un **backend** en Node.js/Express con almacenamiento persistente en archivo JSON y documentación Swagger, y un **frontend** en React con Vite, React Router, Context API y Axios.
+La aplicación cuenta con un **tablero Kanban** con drag & drop para gestionar el estado de los pedidos, una **página de métricas** con gráficos de ventas y productos, y documentación Swagger de la API.
 
 ---
 
@@ -25,12 +27,11 @@ La aplicación cuenta con un **backend** en Node.js/Express con almacenamiento p
 |---|---|
 | **React 18** | Biblioteca para construir la interfaz de usuario |
 | **Vite** | Herramienta de construcción y servidor de desarrollo rápido |
-| **React Router v6** | Navegación entre páginas (Inicio, Pedidos) |
+| **React Router v6** | Navegación entre páginas (Inicio, Pedidos, Métricas) |
+| **@hello-pangea/dnd** | Drag & drop en el tablero Kanban |
+| **Chart.js + react-chartjs-2** | Gráficos de barras y doughnut en Métricas |
 | **Axios** | Cliente HTTP para consumir la API del backend |
 | **Context API** | Estado global compartido (PedidoContext) |
-| **useState** | Manejo de estado local en formularios |
-| **useEffect** | Carga inicial de datos desde la API |
-| **useContext** | Acceso al estado global desde cualquier componente |
 | **useReducer** | Gestión de acciones CRUD (agregar, actualizar, eliminar) |
 | **CSS puro** | Estilos responsive sin librerías externas |
 
@@ -87,8 +88,6 @@ cd backend
 npm install
 ```
 
-Este comando instalará `express`, `cors`, `swagger-jsdoc` y `swagger-ui-express`.
-
 ### 3. Instalar dependencias del frontend
 
 Abre una **nueva terminal** (sin cerrar la anterior) y ejecuta:
@@ -97,8 +96,6 @@ Abre una **nueva terminal** (sin cerrar la anterior) y ejecuta:
 cd frontend
 npm install
 ```
-
-Este comando instalará `react`, `react-dom`, `react-router-dom`, `axios` y `vite`.
 
 ### 4. Ejecutar el backend
 
@@ -127,14 +124,14 @@ cd frontend
 npm run dev
 ```
 
-El frontend se iniciará en `http://localhost:3000` y se abrirá automáticamente en tu navegador.
+El frontend se iniciará en `http://localhost:3001` y se abrirá automáticamente en tu navegador.
 
 ### 6. Abrir la aplicación
 
 Ve a tu navegador y abre:
 
 ```
-http://localhost:3000
+http://localhost:3001
 ```
 
 ### 7. Abrir la documentación Swagger
@@ -154,7 +151,7 @@ app_pedidos/
 │
 ├── backend/                        # Servidor API REST
 │   ├── controllers/
-│   │   └── pedidoController.js     # Lógica CRUD de pedidos
+│   │   └── pedidoController.js     # Lógica CRUD + métricas
 │   ├── routes/
 │   │   └── pedidoRoutes.js         # Definición de rutas + docs Swagger
 │   ├── data/
@@ -169,12 +166,18 @@ app_pedidos/
 │   ├── src/
 │   │   ├── components/
 │   │   │   ├── Navbar.jsx          # Barra de navegación
-│   │   │   └── PedidoForm.jsx      # Formulario de registro de pedidos
+│   │   │   ├── PedidoForm.jsx      # Formulario de registro de pedidos
+│   │   │   ├── KanbanBoard.jsx     # Tablero Kanban (DragDropContext)
+│   │   │   ├── KanbanColumn.jsx    # Columna del Kanban (Droppable)
+│   │   │   ├── KanbanCard.jsx      # Tarjeta del Kanban (Draggable)
+│   │   │   ├── Modal.jsx           # Modal reutilizable
+│   │   │   └── CrearPedidoModal.jsx # Modal con formulario de creación
 │   │   ├── context/
 │   │   │   └── PedidoContext.jsx   # Contexto global + Provider
 │   │   ├── pages/
-│   │   │   ├── Inicio.jsx          # Página de inicio
-│   │   │   └── Pedidos.jsx         # Página con tabla de pedidos
+│   │   │   ├── Inicio.jsx          # Página de inicio (hero + kanban)
+│   │   │   ├── Pedidos.jsx         # Tabla de pedidos con acciones
+│   │   │   └── Metricas.jsx        # Dashboard con gráficos de ventas
 │   │   ├── services/
 │   │   │   └── pedidoService.js    # Llamadas Axios al backend
 │   │   ├── reducer/
@@ -194,111 +197,70 @@ app_pedidos/
 
 ---
 
-## Explicación de conceptos
+## Rutas de la aplicación
 
-### React
+| Ruta | Página | Descripción |
+|---|---|---|
+| `/` | Inicio | Hero, Kanban con drag & drop, feature cards |
+| `/pedidos` | Pedidos | Tabla con todos los pedidos y acciones CRUD |
+| `/metricas` | Métricas | Dashboard con gráficos de ventas por mes y top productos |
 
-React es una biblioteca de JavaScript para construir interfaces de usuario mediante componentes reutilizables. En este proyecto, cada parte de la interfaz (Navbar, formularios, páginas) es un componente independiente.
+---
 
-### Hooks utilizados
-
-#### useState
-
-Maneja el estado local del formulario de pedidos. Se usa en `PedidoForm.jsx` para rastrear los valores de los campos mientras el usuario escribe:
-
-```javascript
-const [form, setForm] = useState({ nombreCliente: '', producto: '', cantidad: '' })
-```
-
-#### useEffect
-
-Ejecuta código al montar el componente. Se usa en `Pedidos.jsx` para cargar los pedidos desde la API al entrar a la página:
-
-```javascript
-useEffect(() => {
-  cargarPedidos()
-}, [cargarPedidos])
-```
-
-#### useContext
-
-Permite acceder al estado global desde cualquier componente sin necesidad de pasar props manualmente. Se usa en `PedidoForm.jsx` y `Pedidos.jsx` para acceder a las funciones del contexto:
-
-```javascript
-const { pedidos, cargarPedidos, actualizarPedido, eliminarPedido } = usePedidos()
-```
-
-#### useReducer
-
-Gestiona el estado de los pedidos mediante acciones (`cargar`, `agregar`, `actualizar`, `eliminar`). Se combina con Context API en `PedidoContext.jsx`:
-
-```javascript
-const [pedidos, dispatch] = useReducer(pedidoReducer, [])
-```
-
-### Context API
-
-Crea un estado global accesible desde cualquier componente. El `PedidoProvider` envuelve toda la aplicación en `main.jsx` y expone:
-
-- `pedidos`: el arreglo de pedidos
-- `cargarPedidos()`: carga los pedidos desde la API
-- `agregarPedido()`: crea un nuevo pedido
-- `actualizarPedido()`: cambia el estado de un pedido
-- `eliminarPedido()`: elimina un pedido
-
-### Axios
-
-Cliente HTTP que se comunica con el backend. Se usa en `pedidoService.js` para cada operación CRUD:
-
-```javascript
-import axios from 'axios'
-const respuesta = await axios.get('http://localhost:4000/pedidos')
-```
-
-### Swagger
-
-Herramienta que genera documentación interactiva para la API. Al acceder a `http://localhost:4000/api-docs` puedes probar cada endpoint directamente desde el navegador.
-
-Los endpoints documentados:
+## API REST — Endpoints
 
 | Método | Ruta | Descripción |
 |---|---|---|
 | GET | `/pedidos` | Obtener todos los pedidos |
+| GET | `/pedidos/metricas` | Obtener métricas (ventas del mes, producto top, ventas por mes, top 5 productos) |
 | POST | `/pedidos` | Crear un nuevo pedido |
 | PUT | `/pedidos/:id` | Actualizar el estado de un pedido |
 | DELETE | `/pedidos/:id` | Eliminar un pedido |
+
+Documentación interactiva disponible en `http://localhost:4000/api-docs`.
+
+---
+
+## Funcionalidades destacadas
+
+### Tablero Kanban con Drag & Drop
+
+La página de inicio muestra un tablero con tres columnas (Pendiente, En proceso, Entregado). Las tarjetas de pedidos se pueden **arrastrar y soltar** entre columnas para cambiar su estado, lo que actualiza automáticamente el backend.
+
+### Dashboard de Métricas
+
+La página de Métricas muestra:
+
+- **Ventas del mes**: suma total de `cantidad × precio` de pedidos entregados en el mes actual
+- **Producto más vendido**: producto con mayor cantidad total pedida
+- **Total de pedidos**: cantidad total de pedidos registrados
+- **Gráfico de barras**: histograma de ventas de los últimos 6 meses
+- **Gráfico doughnut**: top 5 productos más vendidos
+
+### Creación de pedidos
+
+Desde la página de inicio, el botón **"Crear Pedido"** abre un modal con un formulario que solicita: nombre del cliente, producto, cantidad y precio unitario. El pedido se crea con estado `Pendiente` y fecha actual.
 
 ---
 
 ## Flujo de la aplicación
 
 ```
-1. El usuario abre la aplicación (http://localhost:3000)
-        │
-2. Ve la página de Inicio con descripción del sistema
-        │
-3. Navega a "Pedidos" usando la barra de navegación
-        │
-4. useEffect() dispara cargarPedidos() → Axios GET /pedidos → se muestran en tabla
-        │
-5. Usuario hace clic en "Crear Pedido"
-        │
-6. Se muestra PedidoForm.jsx (usa useState para los campos)
-        │
-7. Usuario llena el formulario y presiona "Crear Pedido"
-        │
-8. agregarPedido() → Axios POST /pedidos → dispatch({ type: 'agregar' })
-        │
-9. La tabla se actualiza automáticamente con el nuevo pedido
-        │
-10. Usuario puede hacer clic en "Avanzar" para cambiar estado
-    (Pendiente → En proceso → Entregado)
-        │
-11. actualizarPedido() → Axios PUT /pedidos/:id → dispatch({ type: 'actualizar' })
-        │
-12. Usuario puede hacer clic en "Eliminar"
-        │
-13. eliminarPedido() → Axios DELETE /pedidos/:id → dispatch({ type: 'eliminar' })
+1. El usuario abre la aplicación (http://localhost:3001)
+         │
+2. Ve la página de Inicio: hero + Kanban + feature cards
+         │
+3. Puede arrastrar tarjetas entre columnas (drag & drop)
+         │
+4. Puede crear un pedido desde el botón "Crear Pedido" (modal)
+         │
+5. Navega a "Pedidos" para ver la tabla con acciones
+         │
+6. En la tabla: Avanzar estado / Eliminar pedido
+         │
+7. Navega a "Métricas" para ver gráficos de ventas
+         │
+8. Los datos persisten en db.json al recargar la página
 ```
 
 ---
@@ -308,13 +270,15 @@ Los endpoints documentados:
 Para tu informe, se recomienda incluir capturas de:
 
 1. **Pantalla completa**: La aplicación funcionando con frontend y backend
-2. **Página de inicio**: La vista `/` con la descripción del sistema
-3. **Lista de pedidos**: La tabla en `/pedidos` mostrando los datos de ejemplo
-4. **Formulario de creación**: El formulario expandido para crear un nuevo pedido
-5. **Swagger**: La documentación interactiva en `http://localhost:4000/api-docs`
-6. **Código del reducer**: El archivo `pedidoReducer.js` mostrando el manejo de acciones
-7. **Código del contexto**: El archivo `PedidoContext.jsx` mostrando el Provider
-8. **Estructura del proyecto**: El árbol de carpetas
+2. **Página de inicio**: La vista `/` con el tablero Kanban
+3. **Drag & drop**: Arrastrando una tarjeta entre columnas
+4. **Modal de creación**: El formulario dentro del modal
+5. **Lista de pedidos**: La tabla en `/pedidos` con precio, total y fecha
+6. **Métricas**: Dashboard con gráficos de barras y doughnut
+7. **Swagger**: La documentación interactiva en `http://localhost:4000/api-docs`
+8. **Código del reducer**: El archivo `pedidoReducer.js`
+9. **Código del contexto**: El archivo `PedidoContext.jsx`
+10. **Estructura del proyecto**: El árbol de carpetas
 
 ---
 
@@ -324,7 +288,7 @@ Para tu informe, se recomienda incluir capturas de:
 # Iniciar backend (puerto 4000)
 cd backend && npm run dev
 
-# Iniciar frontend (puerto 3000)
+# Iniciar frontend (puerto 3001)
 cd frontend && npm run dev
 
 # Instalar todo (desde la raíz)

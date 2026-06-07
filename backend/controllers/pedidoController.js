@@ -3,8 +3,6 @@ const path = require('path');
 
 const DB_PATH = path.join(__dirname, '../data/db.json');
 
-let currentId = 3; // Siguiente ID disponible (inicia después de los datos de ejemplo)
-
 function leerDB() {
   const data = fs.readFileSync(DB_PATH, 'utf-8');
   return JSON.parse(data);
@@ -26,12 +24,69 @@ const pedidoController = {
     }
   },
 
+  // GET /pedidos/metricas - Obtener métricas
+  obtenerMetricas: (req, res) => {
+    try {
+      const db = leerDB();
+      const ahora = new Date();
+      const mesActual = ahora.getMonth();
+      const anioActual = ahora.getFullYear();
+
+      const pedidosEntregados = db.pedidos.filter(p => p.estado === 'Entregado');
+
+      // Ventas del mes (solo entregados)
+      const ventasMes = pedidosEntregados
+        .filter(p => {
+          const f = new Date(p.fecha);
+          return f.getMonth() === mesActual && f.getFullYear() === anioActual;
+        })
+        .reduce((sum, p) => sum + (p.cantidad * (p.precio || 0)), 0);
+
+      // Producto más vendido por cantidad total
+      const conteoProductos = {};
+      db.pedidos.forEach(p => {
+        conteoProductos[p.producto] = (conteoProductos[p.producto] || 0) + p.cantidad;
+      });
+      const topProductos = Object.entries(conteoProductos)
+        .map(([producto, cantidad]) => ({ producto, cantidad }))
+        .sort((a, b) => b.cantidad - a.cantidad);
+      const productoTop = topProductos[0] || null;
+
+      // Ventas por mes (últimos 6 meses)
+      const ventasPorMes = [];
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(anioActual, mesActual - i, 1);
+        const mes = d.toLocaleDateString('es-ES', { month: 'short' });
+        const anio = d.getFullYear();
+        const total = pedidosEntregados
+          .filter(p => {
+            const f = new Date(p.fecha);
+            return f.getMonth() === d.getMonth() && f.getFullYear() === d.getFullYear();
+          })
+          .reduce((sum, p) => sum + (p.cantidad * (p.precio || 0)), 0);
+        ventasPorMes.push({ mes: `${mes} ${anio}`, total });
+      }
+
+      res.json({
+        success: true,
+        data: {
+          ventasMes,
+          productoTop,
+          totalPedidos: db.pedidos.length,
+          ventasPorMes,
+          topProductos: topProductos.slice(0, 5)
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ success: false, message: 'Error al calcular métricas', error: error.message });
+    }
+  },
+
   // POST /pedidos - Crear un nuevo pedido
   crear: (req, res) => {
     try {
-      const { nombreCliente, producto, cantidad } = req.body;
+      const { nombreCliente, producto, cantidad, precio } = req.body;
 
-      // Validar campos obligatorios
       if (!nombreCliente || !producto || !cantidad) {
         return res.status(400).json({
           success: false,
@@ -52,6 +107,8 @@ const pedidoController = {
         nombreCliente,
         producto,
         cantidad,
+        precio: typeof precio === 'number' && precio > 0 ? precio : 0,
+        fecha: new Date().toISOString(),
         estado: 'Pendiente'
       };
 

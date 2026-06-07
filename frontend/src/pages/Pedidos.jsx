@@ -1,17 +1,36 @@
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { usePedidos } from '../context/PedidoContext'
 import PedidoForm from '../components/PedidoForm'
 
 const ESTADOS = ['Pendiente', 'En proceso', 'Entregado']
 
+function formatearFecha(iso) {
+  if (!iso) return '-'
+  return new Date(iso).toLocaleDateString('es-ES', {
+    day: '2-digit', month: 'short', year: 'numeric'
+  })
+}
+
+function formatearPrecio(n) {
+  return '$' + (n || 0).toLocaleString('es-CO')
+}
+
 function Pedidos() {
   const { pedidos, cargarPedidos, actualizarPedido, eliminarPedido } = usePedidos()
-  const [mostrarForm, setMostrarForm] = useState(false)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [mostrarForm, setMostrarForm] = useState(searchParams.get('crear') === 'true')
   const [mensaje, setMensaje] = useState('')
 
   useEffect(() => {
     cargarPedidos()
   }, [cargarPedidos])
+
+  useEffect(() => {
+    if (mostrarForm) {
+      setSearchParams({})
+    }
+  }, [mostrarForm])
 
   const handleCambiarEstado = async (id, estadoActual) => {
     const idx = ESTADOS.indexOf(estadoActual)
@@ -63,6 +82,9 @@ function Pedidos() {
                 <th>Cliente</th>
                 <th>Producto</th>
                 <th>Cantidad</th>
+                <th>Precio</th>
+                <th>Total</th>
+                <th>Fecha</th>
                 <th>Estado</th>
                 <th>Acciones</th>
               </tr>
@@ -74,6 +96,9 @@ function Pedidos() {
                   <td>{p.nombreCliente}</td>
                   <td>{p.producto}</td>
                   <td>{p.cantidad}</td>
+                  <td>{formatearPrecio(p.precio)}</td>
+                  <td>{formatearPrecio(p.cantidad * (p.precio || 0))}</td>
+                  <td>{formatearFecha(p.fecha)}</td>
                   <td>
                     <span className={badgeClass(p.estado)}>{p.estado}</span>
                   </td>

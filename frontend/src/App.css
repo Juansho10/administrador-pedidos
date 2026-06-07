@@ -287,6 +287,17 @@ tr:hover {
   margin: 0 auto 24px;
 }
 
+.hero-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.hero-buttons .btn {
+  min-width: 160px;
+}
+
 .features {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -295,11 +306,20 @@ tr:hover {
 }
 
 .feature-card {
+  display: block;
   background: #fff;
   padding: 24px;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.08);
   text-align: center;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.feature-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
 }
 
 .feature-card h3 {
@@ -310,6 +330,249 @@ tr:hover {
 .feature-card p {
   font-size: 0.9rem;
   color: #666;
+}
+
+/* ===== Kanban Toolbar ===== */
+.kanban-toolbar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+/* ===== Kanban Board ===== */
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+/* ===== Kanban Column ===== */
+.kanban-col {
+  background: #f0f2f5;
+  border-radius: 10px;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.kanban-col-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  border-radius: 10px 10px 0 0;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.kanban-col-pendiente .kanban-col-header {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.kanban-col-proceso .kanban-col-header {
+  background: #cce5ff;
+  color: #004085;
+}
+
+.kanban-col-entregado .kanban-col-header {
+  background: #d4edda;
+  color: #155724;
+}
+
+.kanban-col-titulo {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.kanban-col-count {
+  background: rgba(0,0,0,0.08);
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+}
+
+.kanban-col-body {
+  flex: 1;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 120px;
+  transition: background 0.2s;
+}
+
+.kanban-col-over {
+  background: rgba(26,115,232,0.06);
+}
+
+.kanban-col-empty {
+  text-align: center;
+  color: #999;
+  font-size: 0.85rem;
+  padding: 24px 0;
+  font-style: italic;
+}
+
+/* ===== Kanban Card ===== */
+.kanban-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 14px 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  cursor: grab;
+  transition: box-shadow 0.2s, transform 0.2s;
+  border-left: 4px solid transparent;
+}
+
+.kanban-card:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.13);
+}
+
+.kanban-card:active {
+  cursor: grabbing;
+}
+
+.kanban-card-dragging {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  transform: rotate(3deg);
+  border-left-color: #1a73e8;
+}
+
+.kanban-card-cliente {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #1a1a1a;
+  margin-bottom: 4px;
+}
+
+.kanban-card-producto {
+  font-size: 0.85rem;
+  color: #555;
+  margin-bottom: 2px;
+}
+
+.kanban-card-cantidad {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+/* ===== Modal ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 32px;
+  max-width: 480px;
+  width: 90%;
+  position: relative;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.2);
+  animation: slideUp 0.25s ease;
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  color: #999;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  color: #333;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* ===== Metricas ===== */
+.metricas-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.metrica-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  border-top: 4px solid #ddd;
+}
+
+.metrica-card-ventas { border-top-color: #28a745; }
+.metrica-card-top { border-top-color: #ffc107; }
+.metrica-card-total { border-top-color: #1a73e8; }
+
+.metrica-label {
+  font-size: 0.85rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.metrica-valor {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #1a1a1a;
+}
+
+.metrica-sub {
+  font-size: 0.85rem;
+  color: #888;
+  margin-top: 4px;
+}
+
+.metricas-charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.metrica-chart-box {
+  background: #fff;
+  border-radius: 10px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.metrica-chart-box h2 {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+@media (max-width: 700px) {
+  .metricas-charts {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ===== Responsive ===== */
@@ -334,6 +597,10 @@ tr:hover {
   .btn + .btn {
     margin-left: 0;
     margin-top: 6px;
+  }
+
+  .kanban-board {
+    grid-template-columns: 1fr;
   }
 
   th, td {

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { usePedidos } from '../context/PedidoContext'
 
-const formVacio = { nombreCliente: '', producto: '', cantidad: '' }
+const formVacio = { nombreCliente: '', producto: '', cantidad: '', precio: '' }
 
 function PedidoForm({ onSuccess }) {
   const [form, setForm] = useState(formVacio)
@@ -12,7 +12,7 @@ function PedidoForm({ onSuccess }) {
     const { name, value } = e.target
     setForm((prev) => ({
       ...prev,
-      [name]: name === 'cantidad' ? Number(value) : value
+      [name]: name === 'cantidad' || name === 'precio' ? (value === '' ? '' : Number(value)) : value
     }))
   }
 
@@ -20,22 +20,35 @@ function PedidoForm({ onSuccess }) {
     e.preventDefault()
     setError('')
 
-    if (!form.nombreCliente || !form.producto || !form.cantidad) {
+    if (!form.nombreCliente.trim() || !form.producto.trim()) {
       setError('Todos los campos son obligatorios')
       return
     }
 
-    if (form.cantidad < 1) {
-      setError('La cantidad debe ser mayor a 0')
+    const cantidad = Number(form.cantidad)
+    if (!cantidad || cantidad < 1) {
+      setError('La cantidad debe ser un número mayor a 0')
+      return
+    }
+
+    const precio = Number(form.precio)
+    if (!precio || precio < 1) {
+      setError('El precio debe ser un número mayor a 0')
       return
     }
 
     try {
-      await agregarPedido(form)
+      await agregarPedido({
+        nombreCliente: form.nombreCliente.trim(),
+        producto: form.producto.trim(),
+        cantidad,
+        precio
+      })
       setForm(formVacio)
       if (onSuccess) onSuccess()
-    } catch {
-      setError('Error al crear el pedido')
+    } catch (err) {
+      console.error('Error al crear el pedido:', err)
+      setError(err?.response?.data?.message || 'Error al crear el pedido')
     }
   }
 
@@ -74,6 +87,19 @@ function PedidoForm({ onSuccess }) {
             type="number"
             min="1"
             value={form.cantidad}
+            onChange={handleChange}
+            placeholder="1"
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="precio">Precio unitario</label>
+          <input
+            id="precio"
+            name="precio"
+            type="number"
+            min="1"
+            value={form.precio}
             onChange={handleChange}
             placeholder="0"
           />

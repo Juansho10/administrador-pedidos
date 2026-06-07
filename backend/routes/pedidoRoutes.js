@@ -59,6 +59,7 @@ const pedidoController = require('../controllers/pedidoController');
  *                     $ref: '#/components/schemas/Pedido'
  */
 router.get('/', pedidoController.obtenerTodos);
+router.get('/metricas', pedidoController.obtenerMetricas);
 
 /**
  * @openapi

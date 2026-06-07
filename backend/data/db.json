@@ -5,20 +5,26 @@
       "nombreCliente": "Juan Pérez",
       "producto": "Hamburguesa Clásica",
       "cantidad": 2,
-      "estado": "Pendiente"
+      "precio": 12000,
+      "fecha": "2026-06-01T14:30:00.000Z",
+      "estado": "En proceso"
     },
     {
       "id": 2,
       "nombreCliente": "María García",
       "producto": "Pizza Familiar",
       "cantidad": 1,
-      "estado": "En proceso"
+      "precio": 35000,
+      "fecha": "2026-06-03T10:15:00.000Z",
+      "estado": "Entregado"
     },
     {
       "id": 3,
       "nombreCliente": "Carlos López",
       "producto": "Refresco de Cola",
       "cantidad": 5,
+      "precio": 3000,
+      "fecha": "2026-05-28T18:00:00.000Z",
       "estado": "Pendiente"
     }
   ]
